@@ -81,6 +81,23 @@ export default class Provider {
     return new Provider(connection, wallet, options);
   }
 
+  static env2(): Provider {
+    if (isBrowser) {
+      throw new Error(`Provider env is not available on browser.`);
+    }
+
+    const process = require("process");
+    const url = process.env.ANCHOR_PROVIDER_URL;
+    if (url === undefined) {
+      throw new Error("ANCHOR_PROVIDER_URL is not defined");
+    }
+    const options = Provider.defaultOptions();
+    const connection = new Connection(url, options.commitment);
+    const NodeWallet = require("./nodewallet.js").default;
+    const wallet = NodeWallet.local();
+
+    return new Provider(connection, wallet, options);
+  }
   /**
    * Sends the given transaction, paid for and signed by the provider's wallet.
    *
